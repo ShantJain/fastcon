@@ -1,0 +1,61 @@
+<ion-header *ngIf="data">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button mode="md" fill="clear" (click)="backHome()">
+        <ion-icon style="font-size: 2em;" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{data.name}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="data">
+  <ion-row style="background: #fff;margin: 10px;">
+    <ion-col size="3"> 
+      <img-loader useImg [src]="data.img_src ? data.img_src : ''" style="max-width: 90px"></img-loader>
+    </ion-col>
+    <ion-col size="9">  
+       <p [innerHTML]="data.name"></p>
+       <ion-row >
+        <ion-col size="4">{{data.price | money: settings.all.settings}}</ion-col>
+        <ion-col size="4">Qty:{{data.quantity}}</ion-col>
+        <ion-col size="4">{{data.subtotal}}</ion-col>
+      </ion-row>
+    </ion-col>
+  </ion-row>
+  <ion-row style="padding: 10px 20px;" *ngIf="action=='1'">
+    <ion-col size="12"> 
+      <ion-radio-group [(ngModel)]="itemsActions" > 
+        <ion-row>
+          <ion-col size="6">  
+            <ion-item>
+              <ion-radio value="1"></ion-radio>
+              <ion-label>EXCHANGE</ion-label>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">  
+            <ion-item>
+              <ion-radio value="2"></ion-radio>
+              <ion-label>REFUND</ion-label>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-radio-group>
+    </ion-col>
+  </ion-row>
+  <ion-row style="padding: 10px 20px;">
+      <div style="margin: 10px;">
+        Reason :{{selReason}}
+      </div>
+  </ion-row>
+  <ion-row style="padding: 10px 20px;">
+      <ion-col size="auto"   *ngFor="let re of reason" (click)="openReasonBox(re)" >
+          <span class="boxTag" [ngClass]="{'active': re.tag == seltag }">{{re.tag}}</span>
+      </ion-col>
+  </ion-row>
+ 
+  <ion-row style="text-align: right;margin: 20px;" >
+    <ion-button expand="full" class="accent-background" style="width: 100%;" *ngIf="action==0" (click)="cancelItems(0)">Cancel</ion-button>
+    <ion-button expand="full" class="accent-background" style="width: 100%;" *ngIf="action==1" (click)="cancelItems(1)">Submit</ion-button>
+  </ion-row>
+</ion-content>

@@ -1,0 +1,49 @@
+
+<ion-content no-padding>
+    <ion-toolbar no-padding>
+        <ion-title>{{'CALCULATE_SHIPPING' | translate}}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button icon-only tappable (click)="close()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+
+  <form [formGroup]="form" novalidate>
+
+    <ion-list no-lines>
+
+      <ion-item no-padding>
+        <ion-label position="stacked">{{'COUNTRY'|translate}}</ion-label>
+        <ion-select formControlName="country"  cancelText="Cancel" okText="Select"
+          required (ionChange)="getStates()">
+          <ion-select-option *ngFor="let x of countries" [value]="x.id" [innerHTML]="x.name"></ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item no-padding *ngIf="states.length > 0">
+        <ion-label position="stacked">{{'STATE'|translate}}</ion-label>
+        <ion-select formControlName="state"  cancelText="Cancel" okText="Select">
+          <ion-select-option *ngFor="let x of states" [value]="x.id" [innerHTML]="x.name"></ion-select-option>
+        </ion-select>
+      </ion-item>
+<!-- 
+      <ion-item no-padding *ngIf="states.length == 0">
+        <ion-label position="stacked">{{'STATE'|translate}}</ion-label>
+        <ion-input formControlName="state" type="text"></ion-input>
+      </ion-item> -->
+
+      <ion-item no-padding>
+        <ion-label position="stacked">{{'POSTCODE'|translate}}</ion-label>
+        <ion-input formControlName="postcode" type="number" inputmode="numeric" pattern="[0-9]*" [dir]="dir"></ion-input>
+      </ion-item>
+
+    </ion-list>
+  </form>
+
+</ion-content>
+<ion-footer>
+  <ion-button expand="full" class="accent-background" (click)="submit()">
+    {{"DONE" | translate}}
+  </ion-button>
+</ion-footer>

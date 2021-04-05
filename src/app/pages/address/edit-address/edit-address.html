@@ -1,0 +1,84 @@
+<ion-header >
+  <ion-toolbar>
+    <ion-buttons slot="start" mode="ios">
+      <ion-button icon-only ion-button (click)="dismiss()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      {{(addressType.toUpperCase() || '') | translate}} {{'ADDRESS' | translate}}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <ion-list no-lines padding-left padding-right>
+      <ion-item>
+        <ion-label position="stacked">{{'FIRST_NAME' | translate}} <span class="mandatory">*</span></ion-label>
+        <ion-input formControlName="first_name" type="text" [dir]="dir"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">{{'LAST_NAME' | translate}} <span class="mandatory">*</span></ion-label>
+        <ion-input formControlName="last_name" type="text" [dir]="dir"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">{{'COMPANY' | translate}}</ion-label>
+        <ion-input formControlName="company" type="text" [dir]="dir"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="addressType=='billing'">
+        <ion-label position="stacked">{{'EMAIL' | translate}} <span class="mandatory">*</span></ion-label>
+        <ion-input formControlName="email" type="email" [dir]="dir"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="addressType=='billing'">
+        <ion-label position="stacked">{{'PHONE_NUMBER' | translate}} <span class="mandatory">*</span></ion-label>
+        <ion-input formControlName="phone" type="number" inputmode="numeric" pattern="[0-9]*" [dir]="dir"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">{{'COUNTRY' | translate}} <span class="mandatory">*</span></ion-label>
+        <ion-select formControlName="country" interface="popover" (ionChange)="getStates()">
+          <ion-select-option *ngFor="let x of countries" [value]="x.id" [innerHTML]="x.name"></ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item *ngIf="states.length > 0">
+        <ion-label position="stacked">{{'STATE' | translate}} <span class="mandatory">*</span></ion-label>
+        <ion-select formControlName="state" interface="popover">
+          <ion-select-option *ngFor="let x of states" [value]="x.id" [innerHTML]="x.name"></ion-select-option>
+        </ion-select>
+      </ion-item>
+<!-- 
+      <ion-item *ngIf="states.length == 0">
+        <ion-label position="stacked">{{'STATE' | translate}} <span class="mandatory">*</span></ion-label>
+        <ion-input formControlName="state" type="text"></ion-input>
+      </ion-item> -->
+
+      <ion-item>
+        <ion-label position="stacked">{{'CITY' | translate}} <span class="mandatory">*</span></ion-label>
+        <ion-input formControlName="city" type="text" [dir]="dir"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">{{'POSTCODE' | translate}} <span class="mandatory">*</span></ion-label>
+        <ion-input formControlName="postcode" type="number" inputmode="numeric" pattern="[0-9]*" [dir]="dir"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">{{'ADDRESS_1' | translate}} <span class="mandatory">*</span></ion-label>
+        <ion-textarea formControlName="address_1" name="description"></ion-textarea>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">{{'ADDRESS_2' | translate}}</ion-label>
+        <ion-textarea formControlName="address_2" name="description"></ion-textarea>
+      </ion-item>
+    </ion-list>
+    <ion-button expand="full"  (click)="submit()" class="accent-background">{{'SAVE' | translate}}</ion-button>
+  </form>
+</ion-content>

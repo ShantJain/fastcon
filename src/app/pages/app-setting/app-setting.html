@@ -1,0 +1,23 @@
+<ion-header>
+   <ion-toolbar>
+    <ion-title>
+      {{'APP' | translate}} {{'SETTING' | translate}}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content no-padding>
+  <ion-list no-padding mode="md">
+    <!-- <ion-button ion-item mode="ios" (click)="goTo('AccountSettingsNotificationsPage')">
+        Notifications
+      </ion-button> -->
+    <ion-item tappable (click)="goTo('LanguageSettingPage')">
+      {{'LANGUAGE' | translate}}
+    </ion-item>
+    <ion-item tappable (click)="goTo('TosPage')">
+      {{'TOS' | translate}}
+    </ion-item>
+    <ion-item *ngIf="app.version">
+      {{'VERSION' | translate}} {{app.version}}
+    </ion-item>
+  </ion-list>
+</ion-content>

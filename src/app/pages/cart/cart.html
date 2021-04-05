@@ -1,0 +1,161 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button mode="md" fill="clear" icon-only (click)="backHome()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      {{'CART' | translate}}
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" icon-only (click)="showSearch()">
+        <ion-icon name="search"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  
+
+  <div class="div" *ngIf="cart.cart_data && cart.cart_data.length==0">
+    <ion-grid>
+      <ion-row align-items-center>
+        <ion-col align-self-center text-center>
+          <ion-icon name="cart"  class="accent" style="transform: scale(2);"></ion-icon>
+          <h4 margin-top class="accent">{{'CART_EMPTY' | translate}}</h4>
+          <ion-button  class="accent-background" (click)="goTo('product','')">
+            {{'START_SHOPPING' | translate}}
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <ion-list style="padding: 0px;margin: 0px;" *ngIf="cart.cart_data && cart.cart_data.length>0">
+    <!-- <ion-item-sliding #item > -->
+    <ion-item text-wrap *ngFor="let product of cart.cart_data; let i=index">
+      <ion-row>
+        <ion-col size="4"> 
+          <img-loader useImg [src]="product.image" style="max-width: 90px;"></img-loader>
+        </ion-col>
+        <ion-col size="8"> 
+          <div class="product-name-and-delete">
+            <h2 style="font-size: 16px; font-weight: 600;" [innerHtml]="product.name"></h2>
+            <ion-button fill="clear" slot="end"  (click)="removeCart(product.cart_item_key,i)">
+              <ion-icon slot="icon-only" style="color: #000;" name="trash"></ion-icon>
+            </ion-button>
+            
+          </div>
+          <!--<div class="variation-div" [innerHtml]="product.varitions" *ngIf="product.varitions"></div>-->
+          <div class="price_quantity">
+              <div class="product_price" style="font-size: 16px; font-weight: 600;">
+                {{'PRICE' | translate }}:
+                <span  [innerHtml]="product.subtotal" style="font-size: medium;"></span>
+              </div>
+              <div class="center-div-quantity product_quantity" slot="end" *ngIf="product.sold_ind=='false'">
+                <ion-button fill="clear" color="light"  class="quantituboxBut"  (click)="decreaseQuantity(i)">
+                  <ion-icon slot="icon-only" name="remove"></ion-icon>
+                </ion-button>
+                <span class="border" [innerHtml]="product.quantity || 0"></span>
+                <ion-button fill="clear" color="light"  class="quantituboxBut" (click)="increaseQuantity(i)">
+                  <ion-icon slot="icon-only" name="add"></ion-icon>
+                </ion-button>
+              </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-item>
+    <!-- <ion-item-options side="end">
+        <ion-button icon-top class="accent-background" tappable (click)="removeCart(product.cart_item_key,i)">
+          <ion-icon name="trash" style="zoom:2"></ion-icon>
+          {{'DELETE' | translate}}
+        </ion-button>
+      </ion-item-options>
+    </ion-item-sliding> -->
+  </ion-list>
+
+  <div *ngIf="cart.cart_data && cart.cart_data.length>0" class="price-details">
+    <ion-item *ngIf="!inputCoupon" lines="none" (click)="couponToggle()">
+      <img src="assets/svgs/voucher.svg" style="width: 24px; height: 36px;"/>
+      <ion-label style="padding-left: 10px;">{{'ENTER_COUPON_CODE' | translate}}</ion-label>
+      <ion-icon name="chevron-forward" slot="end"></ion-icon>
+    </ion-item>
+    
+    <div class="applied_coupons" padding-left padding-right>
+      <p *ngFor="let coupon of cart.coupon; let i=index">
+        <span [innerHTML]="coupon.code + ' '"></span>
+        <span>{{"APPLIED" | translate}}</span>
+        <ion-button fill="clear" size="small" slot="end" (click)="removeCoupon(coupon.code)">
+          <ion-icon slot="icon-only" name="close-circle" color="light"> </ion-icon>
+        </ion-button>
+      </p>
+    </div>
+  </div>
+
+  <div *ngIf="this.cart.shipping_method && this.cart.shipping_method.length>0" class="price-details">
+    <ion-list mode="md" >
+      <ion-radio-group [ngModel]="this.cart.chosen_shipping_method">
+        <ion-list-header mode="md" no-margin>
+          {{"SHIPPING_METHODS" | translate}}
+        </ion-list-header>
+        <ion-item *ngFor="let method of this.cart.shipping_method; let i=index" lines="none">
+          <ion-label [innerHtml]="method.shipping_method_name"></ion-label>
+          <span slot="end" [innerHTML]="method.shipping_method_price"></span>
+          <ion-radio [value]="method.id" (click)="getCart(method.id)" color="dark" *ngIf="this.cart.shipping_method.length>1">
+          </ion-radio>
+        </ion-item>      
+      </ion-radio-group>
+      <div class="calculateBut" style="float: right;">
+        <ion-button fill="clear" slot="end" (click)="calculateShipping()" color="accent">
+          <u>{{'CALCULATE_SHIPPING'|translate}}</u>
+        </ion-button>
+      </div>
+    </ion-list>
+  </div>
+
+  <div *ngIf="cart.cart_data && cart.cart_data.length>0" class="price-details">
+    <ion-list mode="md">
+      <ion-list-header mode="md" no-margin>
+        {{'ORDER_SUMMARY' | translate}}
+      </ion-list-header>
+      <ion-item lines="none" style="height: 35px;">
+        <div [innerHTML]="'SUBTOTAL' | translate"></div>
+        <div slot="end" [innerHTML]="cart.cart_subtotal"></div>
+      </ion-item>
+
+      <ion-item *ngIf="cart.shipping_method && cart.shipping_method.length>0" lines="none" style="height: 35px;">
+        <div [innerHTML]="'SHIPPING_FEE' | translate"></div>
+        <div slot="end" [innerHTML]="shipping_price()"></div>
+      </ion-item>
+
+      <ion-item lines="none" style="height: 35px;">
+        <div>{{'TAX'| translate}}</div>
+        <div slot="end" [innerHTML]="cart.taxes"></div>
+      </ion-item>
+      <!-- <ng-container *ngIf="cart.taxes" style="height: 35px;">
+        <ion-item no-padding no-lines *ngFor="let key of objectKeys(cart.taxes)">
+          <div [innerHTML]="key"></div>
+          <div slot="end" [innerHTML]="cart.taxes[key]"></div>
+        </ion-item>
+      </ng-container> -->
+      <ion-item style="height: 35px;">
+        <span> Total Discount</span>
+        <span slot="end" [innerHTML]="cart.discount_total"></span>
+      </ion-item>
+
+      <ion-item class="ord_total" lines="none" style="height: 35px;border-top: 1px solid #757575;">
+        <div class="totalLab">{{'TOTAL'|translate}}</div>
+        <div class="totalCost" slot="end" [innerHTML]="cart.total"></div>
+      </ion-item>
+    </ion-list>
+    <!-- </fieldset> -->
+  </div>
+</ion-content>
+
+<ion-footer *ngIf="cart.cart_data && cart.cart_data.length>0">
+  <ion-button expand="full" class="accent-background" (click)="checkout()" style="color: black;height: 60px;">
+    {{'CHECKOUT'|translate}} | &nbsp; <span [innerHtml]="cart.total"></span>
+  </ion-button>
+</ion-footer>

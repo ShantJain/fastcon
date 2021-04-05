@@ -1,0 +1,17 @@
+<ion-header *ngIf="_dataRes">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button mode="md" fill="clear" (click)="dismiss()">
+        <ion-icon style="font-size: 2em;" name="close-circle"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{_dataRes.tag}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+    <ion-item *ngFor="let re of res" (click)="selecRes(re)">
+      <ion-label>
+        {{re.element}}
+      </ion-label>
+    </ion-item>
+</ion-content> 

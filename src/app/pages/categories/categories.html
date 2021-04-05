@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button mode="md" fill="clear" icon-only (click)="backHome()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{'CATEGORIES' | translate}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button mode="md" fill="clear" icon-only (click)="showSearch()">
+        <ion-icon name="search"></ion-icon>
+      </ion-button>
+      <ion-button  icon-only (click)="goTo('wishlist')">
+        <ion-icon name="heart"></ion-icon>
+        <ion-badge *ngIf="wishlist.total && wishlist.total > 0"
+          >{{wishlist.total}}</ion-badge
+        >
+       
+      </ion-button>
+      <ion-button mode="md" fill="clear" icon-only (click)="goTo('myCart')">
+        <ion-icon name="cart"></ion-icon>
+        <ion-badge *ngIf="settings.all && settings.cartCount > 0"
+          >{{settings.cartCount}}</ion-badge
+        >
+       
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content no-padding>
+  <ion-row style="height: 100%;">
+    <ion-col size="4" class="tab_btn" style="padding: 0px;height: 100%;overflow-y: auto;">
+        <ul style="padding: 0px;margin-top: 0px;">
+          <ng-container *ngFor="let item of categories;let i=index">
+            <div style="display: flex;flex-direction: column;justify-content: center;align-items: center;"
+              [ngClass]="{'active': item.isExpanded}"
+              (click)="gotoSubCategory(item)"
+            >
+              <img
+                [src]="item.image ? item.image.src : 'https://ppc.tools/wp-content/themes/ppctools/img/no-thumbnail.jpg'"
+                style="width: 40px; height: 40px; margin-top: 20px"
+              />
+              <p class="tabs" tappable>{{item.name.replace('amp;', '')}}</p>
+            </div>
+          </ng-container>
+        </ul>
+    </ion-col>
+    <ion-col size="8" class="tab_content" style="height: 100%;overflow-y: auto;" >
+        <ion-row >
+          <ion-col size="auto" >
+            <ng-container *ngFor="let item of subCategories;">
+              <div style="padding: 10px 5px; background: #fff;margin: 5px;border-radius: 4px;">
+                <p class="tabs"  style="margin: 0; font-weight: 700; padding-left: 10px">
+                  {{item.name.replace('amp;', '')}}
+                </p>
+                <div style="display: flex; flex-wrap: wrap">
+                  <ng-container *ngIf="item.children.length>0">
+                    <div
+                      *ngFor="let subItem of item.children;"
+                      style="padding: 10px 0 5px; width: 33.33%; text-align: center"
+                      (click)="goTo('product',subItem)">
+                      <img [src]="subItem.image ? subItem.image.src : 'https://ppc.tools/wp-content/themes/ppctools/img/no-thumbnail.jpg'"
+                        useImg style="width: 60px; height: 60px"/>
+                      <p class="tabs" style="margin: 0">
+                        {{subItem.name.replace('amp;', '')}}
+                      </p>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </ng-container>
+          </ion-col>
+        </ion-row>
+    </ion-col>
+  </ion-row>
+</ion-content>

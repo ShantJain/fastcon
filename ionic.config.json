@@ -1,0 +1,7 @@
+{
+  "name": "Fastcon Shopping",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

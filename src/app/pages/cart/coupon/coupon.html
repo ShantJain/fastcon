@@ -1,0 +1,52 @@
+<ion-header>
+
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{"APPLY_COUPON" | translate}}</ion-title>
+  </ion-toolbar>
+  <ion-item no-lines class="coupon_enter_bar">
+    <img src="assets/svgs/voucher.svg" style="width:24px;height: 36px" item-start />
+    <ion-input [placeholder]="'ENTER_COUPON_CODE' | translate" [(ngModel)]="inputCoupon" [dir]='dir'>
+    </ion-input>
+    <ion-button item-end ion-button small class="accent-background inputBut" (click)="applyCoupon(inputCoupon)">
+      {{"APPLY" | translate}}
+    </ion-button>
+  </ion-item>
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list no-padding class="coupon-list">
+    <ion-item text-wrap no-padding *ngFor="let coupon of coupons" class="coupon" tappable (click)="applyCoupon(coupon.code)">
+      <div class="coupon_code_name">
+        <!-- <span>
+          {{"USE_CODE" | translate}}
+        </span> -->
+        <span text-uppercase>
+          {{coupon.code}}
+        </span>
+      </div>
+      <div class="coupon_desc">
+        <p>
+          {{coupon.description}}
+        </p>
+        <p>
+          <span>{{"VALID_TILL" | translate}} </span> <span>{{coupon.date_expires?(coupon.date_expires | date: 'MMM dd,yyyy'):'no limit'}}</span>
+        </p>
+      </div>
+      <ion-button class="accent-background coupon_apply_btn" item-end>
+        {{"APPLY" | translate}}
+      </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>
+<ion-footer *ngIf="errMsg">
+  <ion-item text-wrap color="dark">
+    <span [innerHTML]="errMsg"></span>
+    <ion-button item-end color="dark" (click)="toggleERR()">{{"OK" | translate}}</ion-button>
+  </ion-item>
+</ion-footer>

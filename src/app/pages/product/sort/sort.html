@@ -1,0 +1,44 @@
+<ion-header>
+
+  <ion-toolbar>
+    <ion-title>{{'SORT' | translate}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button icon-only type="button" (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+</ion-header>
+<ion-content>
+  <ion-radio-group [(ngModel)]="sortby" (ionChange)="dismiss(sortby)">
+    <ion-list lines="none" >
+
+      <ion-item mode="ios">
+        <ion-label>{{'POPULARITY' | translate}}</ion-label>
+        <ion-radio mode="ios" value="popularity"></ion-radio>
+      </ion-item>
+  
+      <ion-item mode="ios">
+        <ion-label>{{'AVERAGE_RATING' | translate}}</ion-label>
+        <ion-radio mode="ios" value="rating"></ion-radio>
+      </ion-item>
+  
+      <ion-item mode="ios">
+        <ion-label>{{'NEWNESS' | translate}}</ion-label>
+        <ion-radio mode="ios" value="date"></ion-radio>
+      </ion-item>
+  
+      <ion-item mode="ios">
+        <ion-label>{{'PRICE_ASC' | translate}}</ion-label>
+        <ion-radio mode="ios" value="price_asc"></ion-radio>
+      </ion-item>
+  
+      <ion-item mode="ios">
+        <ion-label>{{'PRICE_DESC' | translate}}</ion-label>
+        <ion-radio mode="ios" value="price_desc"></ion-radio>
+      </ion-item>
+  
+    </ion-list>
+  </ion-radio-group>
+</ion-content>

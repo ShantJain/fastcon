@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Fastcon Shopping</string>
+    <string name="title_activity_main">Fastcon Shopping</string>
+    <string name="package_name">com.phoe.fastconshopping</string>
+    <string name="custom_url_scheme">com.phoe.fastconshopping</string>
+  <string name="fb_app_id">1111</string>
+  <string name="fb_app_name">Fastcon Shopping</string>
+
+</resources>

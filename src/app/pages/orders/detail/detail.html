@@ -1,0 +1,178 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button mode="md" fill="clear" (click)="backHome()">
+        <ion-icon style="font-size: 2em;" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{'ORDER' | translate}} #{{data.id}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content no-padding *ngIf="data">
+  <div class="order-details" padding-left padding-right>
+    <ion-list>
+      <ion-item no-padding class="ion-list-header" lines="none">
+          {{'PRODUCTS' | translate}}
+          <div slot="end">
+            {{data.line_items.length}} {{'ITEM' | translate}}&rlm;(s)
+          </div> 
+      </ion-item>
+      <ion-item class="order_products" *ngFor="let x of data.line_items">
+        <ion-row style="width: 100%;">
+          <ion-col size="3"> 
+            <img-loader useImg [src]="x.img_src ? x.img_src : ''" style="max-width: 90px"></img-loader>
+          </ion-col>
+          <ion-col size="9" class="order_products">   
+            <p [innerHTML]="x.name" style="margin: 0px;"></p>
+            <ion-row >
+              <ion-col size="5">{{x.price | money: settings.all.settings}}   </ion-col>
+              <ion-col size="3"> Qty:{{x.quantity}} </ion-col> 
+              <ion-col size="4"> {{x.subtotal}} </ion-col> 
+            </ion-row>
+            <ion-row >
+              <ion-col size="12" *ngIf="x.itemSratus" > 
+                <span style="font-weight: 700;color: #000;">{{x.itemSratus}}</span>
+              </ion-col>
+              <ion-col size="12" *ngIf="(con &lt; (data.line_items.length -1)) && data.line_items.length != 1 && !x.itemSratus && (data.status==='on-hold' || data.status==='pending'|| data.status==='processing')"> 
+                <ion-button (click)="cancelItrems(x,0)"  color="danger">Cancel Items</ion-button></ion-col>
+              <ion-col size="12" *ngIf="(con &lt; (data.line_items.length -1)) && data.line_items.length != 1 && (!x.itemSratus && x.itemSratus!='Cancelled' && x.itemSratus!='Cancel Requested' && x.itemSratus!='Refund Requested' && x.itemSratus!='Refunded') && (data.status==='on-hold' || data.status==='pending'|| data.status==='delivered' || data.status==='completed')"> 
+                <ion-button (click)="cancelItrems(x,1)"  color="danger"> Return/exchange </ion-button></ion-col>
+            </ion-row>
+          </ion-col>
+        </ion-row>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <div class="order-details" padding-left padding-right>
+    <ion-list lines="none">
+      <ion-list-header no-padding lines="none" no-margin>
+        {{'ORDER_SUMMARY' | translate}}
+      </ion-list-header>
+      <ion-item class="ion-no-padding" style="">
+        Status  <span slot="end"> {{data.status}} </span>
+      </ion-item>
+      <ion-item class="ion-no-padding">
+        {{"PAYMENT_METHODS" | translate}}   <span slot="end">
+          {{data.payment_method_title || data.payment_method}}
+        </span>
+      </ion-item>
+      <ion-item class="ion-no-padding" *ngIf="data.fee_lines[0]">
+        {{data.fee_lines[0].name}}  
+          <span slot="end">
+            <span slot="end">{{data.currency_symbol}}</span>
+            {{data.fee_lines[0].total}}
+          </span>
+      </ion-item>
+      <ion-item class="ion-no-padding" *ngIf="data.shipping_lines[0]">
+        {{'SHIPPING' | translate}} ({{data.shipping_lines[0].method_title}})
+        <span slot="end">
+          {{data.shipping_lines[0].total | money: settings.all.settings}}
+        </span>
+      </ion-item>
+      <ion-item class="ion-no-padding" *ngIf="data.shipping_lines[0]">
+        {{'TAX' | translate}}
+        <span slot="end">
+          {{data.total_tax | money: settings.all.settings}}
+        </span>
+      </ion-item>
+      <ion-item class="ion-no-padding" *ngFor="let c of data.coupon_lines">
+        {{'COUPON' | translate}}( {{c.code}})
+        <span slot="end"> {{c.discount | money: settings.all.settings}} </span>
+      </ion-item>
+      <ion-item class="ion-no-padding" class="ord_total">
+        {{'TOTAL' | translate}} Amount
+        <span slot="end">
+          {{calculatePrice(data) | money: settings.all.settings}} (inc. taxes)
+        </span>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <div class="order-details" *ngIf="check">
+    <ion-list lines="none">
+      <ion-list-header lines="none" >
+        Order Track
+      </ion-list-header>
+      <div>
+        <ul class="list-unstyled multi-steps">
+          <li [class]="page=='placed'?'is-active':''">Placed</li>
+          <li [class]="page=='accepted'?'is-active':''">Accepted</li>
+          <li [class]="page=='picked'?'is-active':''">Picked</li>
+          <li [class]="page=='shipped'?'is-active':''">Shipped</li>
+          <li [class]="page=='delivered'?'is-active':''">Delivered</li>
+        </ul>
+      </div>
+    </ion-list>
+  </div>
+
+  <div class="order-details"
+    padding-left
+    padding-right
+    *ngIf="details !='' && details.phoe_wc_manual_ship_enable "
+  >
+    <ion-list lines="none">
+      <ion-list-header no-padding lines="none" no-margin>
+        Click The Link To Track The Order
+      </ion-list-header>
+      <div>
+        <!-- <ion-item class="ion-no-padding">
+          Tracking Number
+          <span slot="end">
+            {{details.phoe_wc_manual_ship_tracking_number}}
+          </span>
+        </ion-item>
+        <ion-item class="ion-no-padding">
+          Name
+          <span slot="end"> {{details.phoe_wc_manual_ship_provider_name}} </span>
+        </ion-item> -->
+        <ion-item class="ion-no-padding">
+          <ion-button color="dark" fill="clear" (click)="customTrackOrder(details.phoe_wc_manual_ship_tracking_link)">
+            <p class="link">Open Tracking Link</p>
+          </ion-button>
+        </ion-item>
+      </div>
+    </ion-list>
+  </div>
+
+  <div class="order-details" padding-left padding-right>
+    <ion-list lines="none">
+      <ion-list-header class="ion-no-padding" lines="none" no-margin>
+        {{'ADDRESS_INFORMATION' | translate}}
+      </ion-list-header>
+      <ion-card class="ion-no-padding" class="add_info">
+        <ion-card-header>
+          <b>{{'BILLING' | translate}} {{'ADDRESS' | translate}}</b>
+        </ion-card-header>
+        <ion-card-content>
+          <p *ngIf="data.billing.company!=''">{{data.billing.company}}</p>
+          <p>{{data.billing.first_name}} {{data.billing.last_name}}</p>
+          <p>{{data.billing.address_1}}</p>
+          <p *ngIf="data.billing.address_2!=''">{{data.billing.address_2}}</p>
+          <p>{{data.billing.city}} - {{data.billing.postcode}}</p>
+          <p>{{data.billing.state}} • {{data.billing.country}}</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="ion-no-padding" class="add_info">
+        <ion-card-header>
+          <b>{{'SHIPPING' | translate}} {{'ADDRESS' | translate}}</b>
+        </ion-card-header>
+        <ion-card-content>
+          <p *ngIf="data.shipping.company!=''">{{data.shipping.company}}</p>
+          <p>{{data.shipping.first_name}} {{data.shipping.last_name}}</p>
+          <p>{{data.shipping.address_1}}</p>
+          <p *ngIf="data.shipping.address_2!=''">{{data.shipping.address_2}}</p>
+          <p>{{data.shipping.city}} - {{data.shipping.postcode}}</p>
+          <p>{{data.shipping.state}} • {{data.shipping.country}}</p>
+        </ion-card-content>
+      </ion-card>
+    </ion-list>
+  </div>
+</ion-content>
+<ion-footer *ngIf="data.status==='on-hold' || data.status==='pending' || data.status==='processing'">
+  <ion-button expand="full" class="accent-background" (click)="orderCancel()">
+    Cancel Order
+  </ion-button>
+</ion-footer>

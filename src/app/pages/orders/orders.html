@@ -1,0 +1,127 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button mode="md" fill="clear" icon-only (click)="backHome()">
+        <ion-icon style="font-size: 2em;" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{"ORDERS" | translate}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button mode="md" fill="clear" icon-only (click)="showSearch()">
+        <ion-icon style="font-size: 2em;" name="search"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="loader_outer" *ngIf="!orders">
+    <div class="loader"></div>
+  </div>
+  <div class="div" *ngIf="orders && orders.length == 0">
+    <ion-grid>
+      <ion-row align-items-center>
+        <ion-col align-self-center text-center>
+          <ion-icon class="accent"></ion-icon>
+          <h4 margin-top class="accent">{{'NO_ORDER' | translate}}</h4>
+          <ion-button
+            class="accent-background"
+            ion-button
+            (click)="goHome()"
+            margin-top
+          >
+            {{'START_SHOPPING' | translate}}
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+  
+  <ion-card class="order_items" *ngFor="let x of newOrder" (click)="goTo('orderDetail',x)">
+    <ion-card-content>
+      <ion-row>
+        <ion-col size="8">
+          <h3 style="white-space: normal; font-weight: 600; font-size: 16px">
+            {{x.line_items[0].name}}
+          </h3>
+          <p style="margin: 5px 0 10px">{{'ORDER_ID' | translate}}- {{x.id}}</p>
+          <p style="font-size: 24px; font-weight: 600; color: black">
+            {{calculatePrice(x) | money: settings.all.settings}}
+          </p>
+        </ion-col>
+        <ion-col size="4">
+          <img-loader useImg
+            [src]="x.line_items[0].data.src ? x.line_items[0].data.src : ''" style="max-width: 90px"
+          ></img-loader>
+          <h3 style="text-align: end;text-transform: uppercase;" class="{{x.status}}" >{{x.status}}</h3>
+        </ion-col>
+      </ion-row>
+    </ion-card-content>
+  </ion-card>
+
+
+  <ion-infinite-scroll *ngIf="hasMore" (ionInfinite)="loadMoreOrders($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>
+
+<!-- <ion-content>
+  <div class="loader_outer" *ngIf="!orders">
+    <div class="loader"></div>
+  </div>
+  <div class="div" *ngIf="orders && orders.length == 0">
+    <ion-grid>
+      <ion-row align-items-center>
+        <ion-col align-self-center text-center>
+          <ion-icon class="accent"></ion-icon>
+          <h4 margin-top class="accent">{{'NO_ORDER' | translate}}</h4>
+          <ion-button
+            class="accent-background"
+            ion-button
+            (click)="goHome()"
+            margin-top
+          >
+            {{'START_SHOPPING' | translate}}
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+  <ion-button
+    class="order_items"
+    *ngFor="let x of orders"
+    ion-item
+    tappable
+    (click)="goTo('orderDetail',x)"
+  >
+    <ion-row>
+      <ion-col col-12>
+        <div>{{'ORDER_ID' | translate}}- {{x.id}}</div>
+        <div [class]="x.status">{{x.status}}</div>
+      </ion-col>
+      <ion-col col-6>
+        <div>{{"NO_OF_ITEMS" | translate}}</div>
+        <div>{{x.line_items.length}} {{'ITEM' | translate}}&rlm;(s)</div>
+      </ion-col>
+      <ion-col col-6>
+        <div>{{"TOTAL" | translate}}</div>
+        <div>{{calculatePrice(x) | money: settings.all.settings}}</div>
+      </ion-col>
+      <ion-col col-6>
+        <div>{{"ORDER_DATE" | translate}}:</div>
+        <div>{{x.date_created | date:'MMM dd,yyyy hh:mma'}}</div>
+      </ion-col>
+      <ion-col col-6>
+        <div>{{"BUYER" | translate}}:</div>
+        <div>{{x.billing.first_name +" "+ x.billing.last_name}}</div>
+      </ion-col>
+      <ion-col col-6>
+        <div style="font-weight: 600; color: #757575">Track Your Order</div>
+        <div></div>
+      </ion-col>
+    </ion-row>
+  </ion-button>
+  <ion-infinite-scroll *ngIf="hasMore" (ionInfinite)="loadMoreOrders($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content> -->

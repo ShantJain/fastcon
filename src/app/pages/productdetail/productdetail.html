@@ -1,0 +1,457 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button mode="md" fill="clear" (click)="back()">
+        <ion-icon name="arrow-back"  slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <span [innerHTML]="product ? product.name :'Loading Product'"></span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button mode="md" fill="clear" (click)="showSearch()">
+        <ion-icon name="search"  slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button mode="md" (click)="goTo('wishlist')">
+        <ion-icon name="heart"  slot="icon-only"></ion-icon>
+        <ion-badge *ngIf="wishlist.total && wishlist.total > 0"></ion-badge>
+       
+      </ion-button>
+      <ion-button mode="md" fill="clear" (click)="goTo('myCart')"> 
+        <ion-icon name="cart"  slot="icon-only"></ion-icon>
+        <ion-badge *ngIf="settings.all && settings.cartCount > 0">{{settings.cartCount}}</ion-badge>
+       
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+ 
+  <ng-container *ngIf="!product">
+    <skeleton-item no-animated height="100vw" margin></skeleton-item>
+    <skeleton-item no-animated height="25px" width="80%" margin></skeleton-item>
+    <skeleton-item no-animated height="14px" width="60%" margin></skeleton-item>
+    <skeleton-item
+      no-animated
+      height="50px"
+      width="100%"
+      margin
+    ></skeleton-item>
+    <skeleton-item no-animated height="12px" width="40%" margin></skeleton-item>
+    <skeleton-item no-animated height="12px" width="20%" margin></skeleton-item>
+  </ng-container>
+  <ng-container *ngIf="product">
+    <ion-slides #slider pager class="header-image" >
+      <ion-slide *ngFor="let x of product.extraImages">
+        <img-loader [src]="x.src" (click)="goTo('imageGallery',product)" >
+        </img-loader>
+      </ion-slide>
+      <ng-container *ngFor="let x of product.images;let i=index">
+        <ion-slide *ngIf="i>0 || product.extraImages.length==0">
+          <img-loader
+            [src]="x.src"
+            (click)="goTo('imageGallery',product)"
+            useImg
+          >
+            <!-- <img-loader [src]="x.src" (click)="zoomImage(x.src,'')" useImg> -->
+          </img-loader>
+        </ion-slide>
+      </ng-container>
+    </ion-slides>
+    <ion-badge class="discount" *ngIf="product.on_sale" >{{product | discount}}</ion-badge >
+
+    <div class="single-product-section">
+      <ion-row style="padding:0px" align-items-center>
+        <ion-col size="11">
+          <h3 item-start [innerHTML]="product.name"></h3>
+        </ion-col>
+        <ion-col size="1" style="padding-top: 20px;">
+          <ion-button  size="small" fill="clear" (click)="share(product)" color="dark">
+            <ion-icon style="font-size: 25px; margin-left: -10px;" name="share-social"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+
+      <!--Short Description-->
+      <!-- <div class="product_shot_desc" [innerHTML]="product.short_description"></div> -->
+      <!--Product price and stock availability-->
+      <div class="price_n_stock">
+        <h5 [innerHTML]="product.price_html"></h5>
+        <span [class]="product.in_stock?'in-stock':'out-stock'"></span>
+      </div>
+
+      <!--Quantity-->
+      <div class="product_quantity"  *ngIf="!product.sold_individually && (product.type=='simple' || product.type=='variable')"
+      >
+        <p>{{'QUANTITY' | translate}}</p>
+        <div class="center">
+          <ion-button class="quantituboxBut" fill="clear" color="light" (click)="decreaseQuantity()">
+            <ion-icon slot="icon-only" name="remove" ></ion-icon>
+          </ion-button>
+          <span class="border">{{product.quantity}}</span>
+          <ion-button class="quantituboxBut" fill="clear" color="light" (click)="increaseQuantity()">
+            <ion-icon slot="icon-only" name="add"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+    <div  class="single-product-section">
+      <div class="product_rating">
+        <rating  *ngIf="product.average_rating"   max="5"  readOnly="true" [(ngModel)]="product.average_rating" class="rating">
+        </rating>
+        <span>
+          ({{product.rating_count || 0}})
+          <span   (click)="goTo('ReviewsPage',product)" class="review" >{{"SEE_ALL_REVIEWS" | translate}}</span>
+        </span>
+       
+      </div>
+    </div>
+
+    <div class="single-product-section"
+      *ngIf="product.variations.length > 0 && product.attributes.length > 0">
+      <ion-list mode="md">
+        <div  *ngFor="let attribute of product.var_attributes;"
+          class="swatches-container-main"
+        >
+          <span class="swatches-title">{{attribute.name}}</span>
+          <div [ngSwitch]="attribute.options_type">
+            <ng-container *ngSwitchCase="'color'">
+              <div style="display: flex">
+                <p style="font-weight: 700; margin-right: 8px">Colour :</p>
+                <p>{{color}}</p>
+              </div>
+              <ng-container *ngFor="let option of attribute.value">
+                <div
+                  [ngClass]="(product.attr[attribute.slug] && product.attr[attribute.slug]==(option.name?option.name:option))?'swatches-selected':''"
+                  class="swatches-container swatches-container-img"
+                   
+                  (click)="onVariationChange(attribute.slug,option)"
+                >
+                  <img
+                    *ngIf="option.src[0] != ''"
+                    [src]="option.src[0]"
+                    class="swatches"
+                  />
+                  <span
+                    *ngIf="option.src[0] == ''"
+                    class="swatches"
+                    [ngStyle]="{'background-color':option.value}"
+                  ></span>
+                </div>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'image'">
+              <ng-container *ngFor="let option of attribute.value">
+                <div
+                  [ngClass]="(product.attr[attribute.slug] && product.attr[attribute.slug]==(option.slug?option.slug:option))?'swatches-selected':''"
+                  class="swatches-container swatches-container-img"
+                   
+                  (click)="onVariationChange(attribute.slug,option)"
+                >
+                  <img [src]="option.value" class="swatches" />
+                </div>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <div style="display: flex">
+                <p style="font-weight: 700; margin-right: 8px">Size :</p>
+                <p style="text-transform: uppercase">{{size}}</p>
+              </div>
+              <ng-container *ngFor="let option of attribute.value">
+                <div
+                  [ngClass]="(product.attr[attribute.slug] && product.attr[attribute.slug]==(option.name?option.name:option))?'swatches-selected':''"
+                  class="swatches-container swatches-container-default"
+                  [ngStyle]="{'border-radius':(option.value||option.name||option).length>4?'3px':'50%'}"
+                  (click)="onVariationChange(attribute.slug,option)"
+                >
+                  <span class="swatches" style="text-transform: uppercase"
+                    >{{option.value||option.name||option}}</span
+                  >
+                </div>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </ion-list>
+    </div>
+
+    <div class="single-product-section"
+      *ngIf="product.grouped_products.length > 0"
+    >
+      <ion-list mode="md" class="grouped_products">
+        <ion-list-header mode="md" style="padding:0px">
+          {{'GROUPED_PRODUCTS' | translate}}
+        </ion-list-header>
+        <ng-container
+          *ngFor="let groupItems of product.grouped_products; let i = index"
+        >
+          <ion-item
+            style="padding:0px"
+            *ngIf="groupItems.sold_individually && groupItems.type!=='variable'"
+          >
+            <ion-label [innerHTML]="groupItems.name"> </ion-label>
+            <ion-checkbox (ionChange)="onCheckChange($event,groupItems)"
+              item-end
+            ></ion-checkbox>
+          </ion-item>
+          <ion-item
+            style="padding:0px"
+            *ngIf="!groupItems.sold_individually && groupItems.type!=='variable'"
+          >
+            <ion-label [innerHTML]="groupItems.name"></ion-label>
+            <div item-end class="center">
+              <ion-button fill="clear" color="dark" (click)="decreaseQuantity(i)">
+                <ion-icon slot="icon-only" name="remove"></ion-icon>
+              </ion-button>
+              <span  class="border"  [innerHtml]="groupItems.quantity || 0"
+              ></span>
+              <ion-button fill="clear" color="dark" (click)="increaseQuantity(i)">
+                <ion-icon slot="icon-only" name="add"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-item>
+          <ion-item
+            style="padding:0px"
+            *ngIf="groupItems.type==='variable'"
+            (click)="goTo('ProductdetailPage',groupItems)"
+          >
+            <ion-label [innerHTML]="groupItems.name"></ion-label>
+            <div item-end>
+              <u> {{'SELECT_OPTIONS' | translate}} </u>
+            </div>
+          </ion-item>
+        </ng-container>
+      </ion-list>
+    </div>
+
+    <div class="single-product-section"
+      *ngIf="this.settings.all.appSettings.pincode_active"
+    >
+      <ion-list class="delivery_option" lines="none" mode="md" style="padding:0px">
+        <ion-list-header mode="md" style="padding:0px">
+          {{'DELIVERY_OPTIONS' | translate}}
+        </ion-list-header>
+        <ion-item class="del_option" *ngIf="postcodeEnter" style="padding:0px">
+          <ion-label stacked> {{'ENTER_POSTCODE' | translate}} </ion-label>
+          <ion-input type="number"
+            [(ngModel)]="newPostCode" clearInput [dir]="dir"
+          ></ion-input>
+          <ion-button fill="clear" (click)="submitPincodeCheck(newPostCode)">
+            Apply
+          </ion-button>
+        </ion-item>
+        <ion-item *ngIf="!postcodeEnter" style="padding:0px">
+          <ion-icon item-start name="pin" style="color: #757575"></ion-icon>
+          <div class="delivery_availablity" *ngIf="!deliveryDetails.delivery">
+            Not Available On This Pin&nbsp;<span>{{postcode}} </span>
+          </div>
+          <div class="delivery_availablity" *ngIf="deliveryDetails.delivery">
+            Available On This Pin&nbsp;<span>{{postcode}} </span>
+          </div>
+          <ion-button fill="clear"  (click)="submitPincodeCheck()">
+            <ion-icon slot="icon-only" name="create"></ion-icon>
+          </ion-button>
+          <p class="location" *ngIf="deliveryDetails.delivery"
+            [innerHTML]="'('+deliveryDetails.state+', '+deliveryDetails.city+')'"
+          ></p>
+        </ion-item>
+
+        <ion-row style="align-items: center"
+          *ngIf="!postcodeEnter && postcode && deliveryDetails.delivery"
+          style="padding:0px"
+        >
+          <ion-col size="1">
+            <div>
+              <ion-icon style="color: #757575" name="checkmark"></ion-icon>
+            </div>
+          </ion-col>
+          <ion-col size="1">
+            <div>
+              <ion-icon
+                style="color: #757575"
+                name="calendar-outline"
+              ></ion-icon>
+            </div>
+          </ion-col>
+          <ion-col size="6" >
+            <div style="font-weight: 800; color: #757575">
+              Estimated Delivery
+            </div>
+            <div
+              style="font-weight: 600; font-size: 12px; color: #757575"
+              [innerHTML]="deliveryDetails.delivery_date"
+            ></div>
+          </ion-col>
+
+          <!-- </ion-col> -->
+        </ion-row>
+      </ion-list>
+    </div>
+
+    <div class="single-product-section">
+      <ion-list lines="none" mode="md" class="specs" style="padding:0px">
+        <ion-list-header mode="md" style="padding:0px">
+          {{'SPECIFICATION' | translate}}
+        </ion-list-header>
+        <ion-grid style="padding:0px;    padding-bottom: 20px;">
+          <ion-row style="padding:0px">
+            <ion-col size="4">{{'CATEGORY' | translate}}</ion-col>
+            <ion-col size="8">
+              <span *ngFor="let cat of product.categories" [innerHTML]="cat.name"></span>
+            </ion-col>
+          </ion-row>
+          <ion-row style="padding:0px" *ngIf="product.total_sales">
+            <ion-col size="4">{{'TOTAL_SALES' | translate}}</ion-col>
+            <ion-col size="8"> {{product.total_sales}} </ion-col>
+          </ion-row>
+          <ion-row style="padding:0px" *ngIf="product.sku">
+            <ion-col size="4">{{'SKU' | translate}}</ion-col>
+            <ion-col size="8"> {{product.sku}} </ion-col>
+          </ion-row>
+          <ion-row *ngIf="product.stock_quantity && product.in_stock">
+            <ion-col size="4">{{'STOCK' | translate}}</ion-col>
+            <ion-col size="8"> {{product.stock_quantity}} </ion-col>
+          </ion-row>
+          <ion-row style="padding:0px" *ngIf="product.weight">
+            <ion-col size="4">{{'WEIGHT' | translate}}</ion-col>
+            <ion-col size="8"> {{product.weight}} </ion-col>
+          </ion-row>
+  
+          <ion-row style="padding:0px" *ngFor="let att of product.attributes">
+            <ion-col col-4 style="padding:0px">{{ att.options_type}}</ion-col>
+            <ion-col col-8 style="padding:0px" *ngIf="att.options">
+              <ng-container *ngFor="let option of att.options">
+                <span *ngIf="option.slug"> {{ option.name }}</span>
+                <span *ngIf="!option.slug"> {{ option}}</span>
+              </ng-container>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-list>
+    </div>
+
+    <div style="padding: 0px 20px;" class="single-product-section"  *ngIf="product.description">
+      <ion-list lines="none" mode="md" style="padding:0px">
+        <ion-list-header mode="md" style="padding:0px">
+          {{'DESCRIPTION' | translate}}
+        </ion-list-header>
+        <ion-item lines="none" style="padding:0px" text-wrap>
+          <div [innerHTML]="product.description.replace(pattern,'')"></div>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <div
+      class="product-slider single-product-section"
+      *ngIf="product.upsell_ids.length>0 && product.upsell"
+    >
+      <ion-list-header lines="none" mode="md">
+        {{'UPSELL' | translate}}
+      </ion-list-header>
+      <ion-slides spaceBetween="8" [slidesPerView]="slidesPerView" [dir]="dir">
+        <ion-slide *ngFor="let y of product.upsell">
+          <div class="product-item">
+            <ion-button class="fav" fill="clear" (click)="setFav(y)" >
+              <ion-icon slot="icon-only" name="heart{{!wishlist.isFav(y) ? '-outline' : ''}}"></ion-icon>
+            </ion-button>
+            <div   (click)="goTo('ProductdetailPage', y)">
+              <img-loader [src]="y.images[0].src" useImg>
+                <ion-badge *ngIf="y.on_sale">{{y | discount}}</ion-badge>
+              </img-loader>
+              <h5 [innerHTML]="y.name" class="product-name"></h5>
+              <div class="price">
+                <span [innerHTML]="y.price_html"></span>
+              </div>
+              <div class="rate">
+                <rating
+                  *ngIf="y.average_rating"
+                  max="5"
+                  readOnly="true"
+                  [(ngModel)]="y.average_rating"
+                >
+                </rating>
+                <span class="rating_count" *ngIf="y.rating_count"
+                  >({{product.rating_count}})</span
+                >
+              </div>
+            </div>
+          </div>
+        </ion-slide>
+      </ion-slides>
+    </div>
+
+    <div
+      class="product-slider single-product-section"
+      *ngIf="product.related_ids.length>0 && product.related"
+    >
+      <ion-list-header lines="none" mode="md">
+        {{'RELATED' | translate}}
+      </ion-list-header>
+      <ion-row class="thumnails" >
+        <ion-col size="4" *ngFor="let y of product.related">
+          <div class="product-item">
+            <ion-button  class="fav" (click)="setFav(y)" fill="clear">
+              <ion-icon slot="icon-only"  name="heart{{!wishlist.isFav(y) ? '-outline' : ''}}" ></ion-icon>
+            </ion-button>
+            <div   (click)="goTo('ProductdetailPage', y)">
+              <img-loader [src]="y.images[0].src" useImg>
+                <ion-badge *ngIf="y.on_sale">{{y | discount}}</ion-badge>
+              </img-loader>
+              <h5 [innerHTML]="y.name" class="product-name"></h5>
+              <div class="price">
+                <span [innerHTML]="y.price_html"></span>
+              </div>
+              <div class="rate">
+                <rating
+                  *ngIf="y.average_rating"
+                  max="5"
+                  readOnly="true"
+                  [(ngModel)]="y.average_rating"
+                >
+                </rating>
+                <span class="rating_count" *ngIf="y.rating_count"
+                  >({{product.rating_count}})</span
+                >
+              </div>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </div>
+  </ng-container>
+</ion-content>
+
+<ion-footer style="height: 50px;" *ngIf="product && (product.purchasable || (product.type==='external' && product.external_url) || product.type==='grouped')"
+>
+  <ion-row style="padding:0px">
+    <ion-col style="padding: 0;" *ngIf="product.type==='external';else purchaseOptions" (click)="buyExternal()">
+      <ion-button expand="full"  slot="start" class="accent-background">
+        <ion-icon ios="ios-open" md="md-open"></ion-icon>
+        {{'BUY_EXTERNAL_PRODUCT' | translate}}
+      </ion-button>
+    </ion-col>
+    <ng-template #purchaseOptions>
+      <ion-col size="6" style="padding: 0;"  *ngIf="product.in_stock" (click)="addToCart(true)">
+        <ion-button  expand="full" class="primary-background">
+          <ion-icon name="basket"></ion-icon>
+          {{'BUY_NOW' | translate}}
+        </ion-button>
+      </ion-col>
+      <ion-col size="6" style="padding: 0;"  *ngIf="product.in_stock" (click)="addToCart()">
+        <ion-button expand="full" class="accent-background" style="color: black" >
+          <ion-icon name="cart"></ion-icon>
+          {{'ADD_TO_CART' | translate}}
+        </ion-button>
+      </ion-col>
+
+      <ion-col style="padding: 0;"  *ngIf="!product.in_stock">
+       
+        <ion-button expand="full" class="accent-background" style="color: black" >
+          <ion-icon name="warning"></ion-icon>
+           {{'OUT_OF_STOCK' | translate}}
+        </ion-button>
+      </ion-col>
+    </ng-template>
+  </ion-row>
+</ion-footer>

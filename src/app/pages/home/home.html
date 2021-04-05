@@ -1,0 +1,615 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button  clear icon-only (click)="openMenu()" >
+      <ion-icon name="menu"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <img src="assets/imgs/FASTCON.png" style="width: 100px; height: 36px" />
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        mode="md"
+        clear
+        icon-only
+        (click)="goTo('notification')"
+      >
+        <ion-icon name="notifications-outline"></ion-icon>
+      </ion-button>
+      <ion-button mode="md" ion-button icon-only (click)="goTo('wishlist')">
+        <ion-icon name="heart"></ion-icon>
+        <ion-badge *ngIf="wishlist.total && wishlist.total > 0">{{wishlist.total}}</ion-badge>
+       
+      </ion-button>
+      <ion-button mode="md" fill="clear" icon-only (click)="goTo('myCart')">
+        <ion-icon name="cart"></ion-icon>
+        <ion-badge *ngIf="settings.cartCount && settings.cartCount > 0"
+          >{{settings.cartCount}}</ion-badge
+        >
+       
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-searchbar
+    style="background-color: var(--primary_color); margin-top: -5px"
+    (click)="showSearch()"
+    autocomplete
+    mode="ios"
+    #searchBar
+    [placeholder]="'SEARCH' | translate"
+  >
+  </ion-searchbar>
+</ion-header>
+
+<ion-content no-padding>
+
+  <ng-container *ngIf="!layout">
+    <skeleton-item no-animated height="180px"></skeleton-item>
+    <ion-item lines="none">
+      <skeleton-item no-animated width="36%"></skeleton-item>
+      <skeleton-item no-animated item-end width="20%"></skeleton-item>
+    </ion-item>
+    <ion-row>
+      <ion-col *ngFor="let x of [0,1,2,3]">
+        <skeleton-item no-animated height="60px"></skeleton-item>
+      </ion-col>
+    </ion-row>
+    <div class="product-slider" *ngFor="let x of [0,1,2,3]">
+      <ion-item lines="none">
+        <skeleton-item no-animated width="36%"></skeleton-item>
+      </ion-item>
+      <ion-slides  pager="false" [options]="slideTapOpts" scrollbar="false" >
+        <ion-slide *ngFor="let x of [0,1,2,3,4]">
+          <skeleton-item no-animated height="160px"></skeleton-item>
+          <skeleton-item no-animated></skeleton-item>
+          <skeleton-item no-animated width="50%"></skeleton-item>
+          <skeleton-item no-animated width="70%" height="10px"></skeleton-item>
+        </ion-slide>
+      </ion-slides>
+    </div>
+  </ng-container>
+
+  <div class="basic" *ngIf="layout">
+    <ion-slides  [options]="slideOpts" class="banner-slide" pager="true"
+      *ngIf="layout.banner && layout.banner.length>0" (click)="handleSlideClick()" >
+      <ion-slide *ngFor="let banner of layout.banner">
+        <img [src]="banner.banner_url" class="banner_img" />
+      </ion-slide>
+    </ion-slides>
+
+    <ion-list  *ngIf="layout.categories && layout.categories.length>0">
+      <ion-item no-padding no-lines style="font-weight: 700">
+        {{'ALL_CATEGORIES'| translate}}
+        <ion-button slot="end" fill="clear" (click)="goTo('categories','')">
+          {{'VIEW_ALL'| translate}}
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-list>
+      <ion-row class="thumnails">
+        <ion-col size="auto"  *ngFor="let x of layout.categories">
+          <img-loader class="img" width="90px" height="90px"
+            backgroundSize="cover"
+            [src]="x.image ? x.image : ''"
+            (click)="goTo('product', x)">
+          </img-loader>
+          <h5 class="categoriesBox" [innerHTML]="x.name"></h5>
+        </ion-col>
+      </ion-row>
+        
+    <!--Custom Layout-->
+    <div class="flipkart">
+      <ng-container *ngFor="let section of layout.section_banners">
+        <div class="one-grid-category" [style.background]="section.background_color"
+          *ngIf="section.layout_type=='1' && (section.bg_img != '' && (section.background_color != '' || section.background_color == '' ))  "
+          [style.backgroundImage]="'url(' + section.bg_img + ')'"
+          style="background-repeat: no-repeat">
+
+          <div class="vewall_area">
+            <h1 [style.color]="section.title_color">{{section.title}}</h1>
+            <ion-button slot="end" (click)="goTo('product', { id: section.layout_main })"
+              [style.background]="section.view_more_bg_color"
+              [style.color]="section.view_more_text_color" >
+              {{'VIEW_ALL'| translate}}
+            </ion-button>
+          </div>
+          <div class="productarea">
+            <ion-row>
+              <ion-col>
+                <div class="productimage" (click)="goTo('product', section.banner[0])">
+                  <img [src]="section.banner[0].banner_url" />
+                  <p  [ngStyle]="{'color':section.banner[0].item_title.color,
+                  'font-weight':section.banner[0].item_title.font_weight,
+                  'font-size':section.banner[0].item_title.font_size,
+                  'font-style':section.banner[0].item_title.style}"
+                  >
+                    {{section.banner[0].item_title.text}}
+                  </p>
+                  <h3
+                    [ngStyle]="{'color':section.banner[0].item_sub_title.color,
+                  'font-weight':section.banner[0].item_sub_title.font_weight,
+                  'font-size':section.banner[0].item_sub_title.font_size,
+                  'font-style':section.banner[0].item_sub_title.style}"
+                  >
+                    {{section.banner[0].item_sub_title.text}}
+                  </h3>
+                </div>
+              </ion-col>
+            </ion-row>
+          </div>
+        </div>
+
+        <div class="one-grid-category" [style.background]="section.background_color" *ngIf="section.layout_type=='1'  && section.bg_img == '' " >
+          <div class="vewall_area">
+            <h1 [style.color]="section.title_color"> {{section.title}}</h1>
+            <ion-button slot="end" mode="md" clear icon-end (click)="goTo('product', { id: section.layout_main })"
+              [ngStyle]="{'background':section.view_more_bg_color,'color':section.view_more_text_color}">
+            {{'VIEW_ALL'| translate}}
+            </ion-button>
+          </div>
+          <div class="productarea">
+            <ion-row>
+              <ion-col>
+                <div class="productimage" (click)="goTo('product', section.banner[0])">
+                  <img [src]="section.banner[0].banner_url" />
+                  <p [ngStyle]="{'color':section.banner[0].item_title.color,
+                  'font-weight':section.banner[0].item_title.font_weight,
+                  'font-size':section.banner[0].item_title.font_size,
+                  'font-style':section.banner[0].item_title.style}"
+                  >
+                    {{section.banner[0].item_title.text}}
+                  </p>
+                  <h3 [ngStyle]="{'color':section.banner[0].item_sub_title.color,
+                  'font-weight':section.banner[0].item_sub_title.font_weight,
+                  'font-size':section.banner[0].item_sub_title.font_size,
+                  'font-style':section.banner[0].item_sub_title.style}"
+                  >
+                    {{section.banner[0].item_sub_title.text}}
+                  </h3>
+                </div>
+              </ion-col>
+            </ion-row>
+          </div>
+        </div>
+
+        <div class="two-grid-category" [style.background]="section.background_color"
+          *ngIf="section.layout_type=='2' && (section.bg_img != '' && (section.background_color != '' || section.background_color == '' )) "
+          [style.backgroundImage]="'url(' + section.bg_img + ')'" style="background-repeat: no-repeat">
+          <div class="vewall_area">
+            <h1 [style.color]="section.title_color"> {{section.title}}</h1>
+            <ion-button slot="end" fill="clear" (click)="goTo('product', { id: section.layout_main })"
+              [ngStyle]="{'background':section.view_more_bg_color,'color':section.view_more_text_color}">
+            {{'VIEW_ALL'| translate}}
+            </ion-button>
+          </div>
+          <div class="productarea">
+            <ion-row>
+              <ion-col size="6" *ngFor="let layout_data of section.banner">
+                <div class="productimage" (click)="goTo('product', layout_data)" >
+                  <img [src]="layout_data.banner_url" />
+                  <p style="text-align: center;" [ngStyle]="{'color':layout_data.item_title.color,
+                  'font-weight':layout_data.item_title.font_weight,
+                  'font-size':layout_data.item_title.font_size,
+                  'font-style':layout_data.item_title.style}"
+                  >
+                    {{layout_data.item_title.text}}
+                  </p>
+                  <h3 style="text-align: center;"
+                    [ngStyle]="{'color':layout_data.item_sub_title.color,
+                  'font-weight':layout_data.item_sub_title.font_weight,
+                  'font-size':layout_data.item_sub_title.font_size,
+                  'font-style':layout_data.item_sub_title.style}"
+                  >
+                    {{layout_data.item_sub_title.text}}
+                  </h3>
+                </div>
+              </ion-col>
+            </ion-row>
+          </div>
+        </div>
+
+        <div class="two-grid-category" [style.background]="section.background_color" *ngIf="section.layout_type=='2' && section.bg_img == '' "
+        >
+          <div class="vewall_area">
+            <h1 [style.color]="section.title_color"> {{section.title}}</h1>
+            <ion-button slot="end" fill="clear" (click)="goTo('product', { id: section.layout_main })"
+              [ngStyle]="{'background':section.view_more_bg_color,'color':section.view_more_text_color}"
+            >
+            {{'VIEW_ALL'| translate}}
+            </ion-button>
+          </div>
+          <div class="productarea">
+            <ion-row>
+              <ion-col size="6" *ngFor="let layout_data of section.banner">
+                <div  class="productimage" tappable (click)="goTo('product', layout_data)" >
+                  <img [src]="layout_data.banner_url" />
+                  <p style="text-align: center;"
+                    [ngStyle]="{'color':layout_data.item_title.color,
+                  'font-weight':layout_data.item_title.font_weight,
+                  'font-size':layout_data.item_title.font_size,
+                  'font-style':layout_data.item_title.style}"
+                  >
+                    {{layout_data.item_title.text}}
+                  </p>
+                  <h3 style="text-align: center;"
+                    [ngStyle]="{'color':layout_data.item_sub_title.color,
+                  'font-weight':layout_data.item_sub_title.font_weight,
+                  'font-size':layout_data.item_sub_title.font_size,
+                  'font-style':layout_data.item_sub_title.style}"
+                  >
+                    {{layout_data.item_sub_title.text}}
+                  </h3>
+                </div>
+              </ion-col>
+            </ion-row>
+          </div>
+        </div>
+
+        <div class="three-grid-category"
+          [ngStyle]="{'background':section.background_color}"
+          *ngIf="section.layout_type=='3'&& (section.bg_img != '' && (section.background_color != '' || section.background_color == '' )) "
+          [style.backgroundImage]="'url(' + section.bg_img + ')'"
+          style="background-repeat: no-repeat"
+        >
+          <div class="vewall_area">
+            <h1 [ngStyle]="{'color':section.title_color}">  {{section.title}}</h1>
+            <ion-button slot="end" fill="clear" (click)="goTo('product', { id: section.layout_main })"
+              [ngStyle]="{'background':section.view_more_bg_color,'color':section.view_more_text_color}"
+            >
+            {{'VIEW_ALL'| translate}}
+            </ion-button>
+          </div>
+          <div class="productarea">
+            <ion-row>
+              <ion-col size="8">
+                <div
+                  class="productimage"
+                  (click)="goTo('product', section.banner[0])"
+                >
+                  <img [src]="section.banner[0].banner_url" />
+                  <p style="text-align: center;"
+                    [ngStyle]="{'color':section.banner[0].item_title.color,
+                  'font-weight':section.banner[0].item_title.font_weight,
+                  'font-size':section.banner[0].item_title.font_size,
+                  'font-style':section.banner[0].item_title.style}"
+                  >
+                    {{section.banner[0].item_title.text}}
+                  </p>
+                  <h3 style="text-align: center;"
+                    [ngStyle]="{'color':section.banner[0].item_sub_title.color,
+                  'font-weight':section.banner[0].item_sub_title.font_weight,
+                  'font-size':section.banner[0].item_sub_title.font_size,
+                  'font-style':section.banner[0].item_sub_title.style}"
+                  >
+                    {{section.banner[0].item_sub_title.text}}
+                  </h3>
+                </div>
+              </ion-col>
+
+              <ion-col col-4>
+                <div
+                  class="productimage"
+                  tappable
+                  (click)="goTo('product', section.banner[1])"
+                >
+                  <img [src]="section.banner[1].banner_url" />
+                  <p
+                    [ngStyle]="{'color':section.banner[1].item_title.color,
+                  'font-weight':section.banner[1].item_title.font_weight,
+                  'font-size':section.banner[1].item_title.font_size,
+                  'font-style':section.banner[1].item_title.style}"
+                  >
+                    {{section.banner[1].item_title.text}}
+                  </p>
+                  <h3
+                    [ngStyle]="{'color':section.banner[1].item_sub_title.color,
+                  'font-weight':section.banner[1].item_sub_title.font_weight,
+                  'font-size':section.banner[1].item_sub_title.font_size,
+                  'font-style':section.banner[1].item_sub_title.style}"
+                  >
+                    {{section.banner[1].item_sub_title.text}}
+                  </h3>
+                </div>
+                <div
+                  class="productimage"
+                  tappable
+                  (click)="goTo('product', section.banner[2])"
+                >
+                  <img [src]="section.banner[2].banner_url" />
+                  <p
+                    [ngStyle]="{'color':section.banner[2].item_title.color,
+                  'font-weight':section.banner[2].item_title.font_weight,
+                  'font-size':section.banner[2].item_title.font_size,
+                  'font-style':section.banner[2].item_title.style}"
+                  >
+                    {{section.banner[2].item_title.text}}
+                  </p>
+                  <h3
+                    [ngStyle]="{'color':section.banner[2].item_sub_title.color,
+                  'font-weight':section.banner[2].item_sub_title.font_weight,
+                  'font-size':section.banner[2].item_sub_title.font_size,
+                  'font-style':section.banner[2].item_sub_title.style}"
+                  >
+                    {{section.banner[2].item_sub_title.text}}
+                  </h3>
+                </div>
+              </ion-col>
+            </ion-row>
+          </div>
+        </div>
+
+        <div class="three-grid-category" [ngStyle]="{'background':section.background_color}"
+          *ngIf="section.layout_type=='3' && section.bg_img == ''"
+        >
+          <div class="vewall_area">
+            <h1 [ngStyle]="{'color':section.title_color}"> {{section.title}} </h1>
+            <ion-button slot="end" fill="clear" (click)="goTo('product', { id: section.layout_main })"
+              [ngStyle]="{'background':section.view_more_bg_color,'color':section.view_more_text_color}"
+            >
+            {{'VIEW_ALL'| translate}}
+            </ion-button>
+          </div>
+          <div class="productarea">
+            <ion-row>
+              <ion-col size="8">
+                <div
+                  class="productimage"
+                  (click)="goTo('product', section.banner[0])"
+                >
+                  <img [src]="section.banner[0].banner_url" />
+                  <p style="text-align: center;"
+                    [ngStyle]="{'color':section.banner[0].item_title.color,
+                  'font-weight':section.banner[0].item_title.font_weight,
+                  'font-size':section.banner[0].item_title.font_size,
+                  'font-style':section.banner[0].item_title.style}"
+                  >
+                    {{section.banner[0].item_title.text}}
+                  </p>
+                  <h3 style="text-align: center;"
+                    [ngStyle]="{'color':section.banner[0].item_sub_title.color,
+                  'font-weight':section.banner[0].item_sub_title.font_weight,
+                  'font-size':section.banner[0].item_sub_title.font_size,
+                  'font-style':section.banner[0].item_sub_title.style}"
+                  >
+                    {{section.banner[0].item_sub_title.text}}
+                  </h3>
+                </div>
+              </ion-col>
+
+              <ion-col col-4>
+                <div
+                  class="productimage"
+                  tappable
+                  (click)="goTo('product', section.banner[1])"
+                >
+                  <img [src]="section.banner[1].banner_url" />
+                  <p
+                    [ngStyle]="{'color':section.banner[1].item_title.color,
+                  'font-weight':section.banner[1].item_title.font_weight,
+                  'font-size':section.banner[1].item_title.font_size,
+                  'font-style':section.banner[1].item_title.style}"
+                  >
+                    {{section.banner[1].item_title.text}}
+                  </p>
+                  <h3
+                    [ngStyle]="{'color':section.banner[1].item_sub_title.color,
+                  'font-weight':section.banner[1].item_sub_title.font_weight,
+                  'font-size':section.banner[1].item_sub_title.font_size,
+                  'font-style':section.banner[1].item_sub_title.style}"
+                  >
+                    {{section.banner[1].item_sub_title.text}}
+                  </h3>
+                </div>
+                <div
+                  class="productimage"
+                  tappable
+                  (click)="goTo('product', section.banner[2])"
+                >
+                  <img [src]="section.banner[2].banner_url" />
+                  <p
+                    [ngStyle]="{'color':section.banner[2].item_title.color,
+                  'font-weight':section.banner[2].item_title.font_weight,
+                  'font-size':section.banner[2].item_title.font_size,
+                  'font-style':section.banner[2].item_title.style}"
+                  >
+                    {{section.banner[2].item_title.text}}
+                  </p>
+                  <h3
+                    [ngStyle]="{'color':section.banner[2].item_sub_title.color,
+                  'font-weight':section.banner[2].item_sub_title.font_weight,
+                  'font-size':section.banner[2].item_sub_title.font_size,
+                  'font-style':section.banner[2].item_sub_title.style}"
+                  >
+                    {{section.banner[2].item_sub_title.text}}
+                  </h3>
+                </div>
+              </ion-col>
+            </ion-row>
+          </div>
+        </div>
+
+        <div *ngIf="section.layout_type=='4' && (section.bg_img != '' && (section.background_color != '' || section.background_color == '' )) "
+          class="four-grid-category"
+          [style.backgroundImage]="'url(' + section.bg_img + ')'"
+          style="background-repeat: no-repeat"
+        >
+          <div class="vewall_area">
+            <h1 [ngStyle]="{'color':section.title_color}"> {{section.title}}</h1>
+            <ion-button slot="end" fill="clear" (click)="goTo('product', { id: section.layout_main })"
+              [ngStyle]="{'background':section.view_more_bg_color,'color':section.view_more_text_color}"
+            >
+            {{'VIEW_ALL'| translate}}
+            </ion-button>
+          </div>
+          <div class="productarea">
+            <ion-row>
+              <ion-col size="6" *ngFor="let layout_data of section.banner">
+                <div class="productimage"
+                  (click)="goTo('product', layout_data)"
+                >
+                  <img [src]="layout_data.banner_url" />
+                  <p style="text-align: center;"
+                    [ngStyle]="{'color':layout_data.item_title.color,'font-weight':layout_data.item_title.font_weight,'font-size':layout_data.item_title.font_size,'font-style':layout_data.item_title.style}"
+                  >
+                    {{layout_data.item_title.text}}
+                  </p>
+                  <h3 style="text-align: center;"
+                    [ngStyle]="{'color':layout_data.item_sub_title.color,'font-weight':layout_data.item_sub_title.font_weight,'font-size':layout_data.item_sub_title.font_size,'font-style':layout_data.item_sub_title.style}"
+                  >
+                    {{layout_data.item_sub_title.text}}
+                  </h3>
+                </div>
+              </ion-col>
+            </ion-row>
+          </div>
+        </div>
+
+        <div class="four-grid-category"
+          [style.background]="section.background_color"
+          *ngIf="section.layout_type=='4' && section.bg_img == ''" >
+          <div class="vewall_area">
+            <h1 [ngStyle]="{'color':section.title_color}">{{section.title}}</h1>
+            <ion-button slot="end" fill="clear" (click)="goTo('product', { id: section.layout_main })"
+              [ngStyle]="{'background':section.view_more_bg_color,'color':section.view_more_text_color}">
+            {{'VIEW_ALL'| translate}}
+            </ion-button>
+          </div>
+          <div class="productarea">
+            <ion-row>
+              <ion-col size="6" *ngFor="let layout_data of section.banner">
+                <div class="productimage" (click)="goTo('product', layout_data)">
+                  <img [src]="layout_data.banner_url" />
+                  <p style="text-align: center;"
+                    [ngStyle]="{'color':layout_data.item_title.color,'font-weight':layout_data.item_title.font_weight,'font-size':layout_data.item_title.font_size,'font-style':layout_data.item_title.style}"
+                  >
+                    {{layout_data.item_title.text}}
+                  </p>
+                  <h3 style="text-align: center;"
+                    [ngStyle]="{'color':layout_data.item_sub_title.color,'font-weight':layout_data.item_sub_title.font_weight,'font-size':layout_data.item_sub_title.font_size,'font-style':layout_data.item_sub_title.style}"
+                  >
+                    {{layout_data.item_sub_title.text}}
+                  </h3>
+                </div>
+              </ion-col>
+            </ion-row>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="product-slider" *ngIf="layout.featured_products && layout.featured_products.length>0">
+      <ion-item lines="none" >
+        {{'FEATURED' | translate}}
+        <ion-button slot="end" fill="clear" (click)="goTo('product',{featured:true})" >
+          See More
+          <ion-icon name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <ion-row class="thumnails" >
+        <ion-col size="4" *ngFor="let product of layout.featured_products">
+          <div class="product-item">
+            <ion-button class="fav" (click)="setFav(product)" fill="clear" slot="icon-only">
+              <ion-icon name="heart{{!wishlist.isFav(product) ? '-outline' : ''}}"></ion-icon>
+            </ion-button>
+            <div (click)="goTo('productdetail', product)">
+              <img-loader [src]="product.images[0].src" useImg>
+                <ion-badge *ngIf="product.on_sale">{{product | discount}}</ion-badge>
+              </img-loader>
+              <h5 [innerHTML]="product.name" class="product-name"></h5>
+              <div class="price">
+                <span [innerHTML]="product.price_html"></span>
+              </div>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <div class="product-slider"  *ngIf="layout.top_seller && layout.top_seller.length>0">
+      <ion-item lines="none">
+        {{'TOP_SELLERS'| translate}}
+        <ion-button slot="end" fill="clear" (click)="goTo('product',{sortby:'popularity'})" >
+          See More
+          <ion-icon name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <ion-row class="thumnails" >
+        <ion-col size="4" *ngFor="let product of layout.top_seller">
+          <div class="product-item">
+            <ion-button class="fav" (click)="setFav(product)" fill="clear" slot="icon-only">
+              <ion-icon name="heart{{!wishlist.isFav(product) ? '-outline' : ''}}"></ion-icon>
+            </ion-button>
+            <div (click)="goTo('productdetail', product)">
+              <img-loader [src]="product.images[0].src" useImg>
+                <ion-badge *ngIf="product.on_sale">{{product | discount}}</ion-badge>
+              </img-loader>
+              <h5 [innerHTML]="product.name" class="product-name"></h5>
+              <div class="price">
+                <span [innerHTML]="product.price_html"></span>
+              </div>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <div class="product-slider" *ngIf="layout.sale_products && layout.sale_products.length>0">
+      <ion-item lines="none">
+        {{"TRENDING_OFFERS"| translate}}
+        <ion-button slot="end" fill="clear" (click)="goTo('product',{on_sale:true})">
+          See More
+          <ion-icon name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <ion-row class="thumnails" >
+        <ion-col size="4" *ngFor="let product of layout.sale_products">
+          <div class="product-item">
+            <ion-button class="fav" (click)="setFav(product)" fill="clear" slot="icon-only" >
+              <ion-icon name="heart{{!wishlist.isFav(product) ? '-outline' : ''}}"
+              ></ion-icon>
+            </ion-button>
+            <div (click)="goTo('productdetail', product)">
+              <img-loader [src]="product.images[0].src" useImg>
+                <ion-badge *ngIf="product.on_sale">{{product | discount}}</ion-badge></img-loader>
+              <h5 [innerHTML]="product.name" class="product-name"></h5>
+              <div class="price">
+                <span [innerHTML]="product.price_html"></span>
+              </div>
+              
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </div>
+
+      <div class="product-slider" *ngIf="layout.top_rated_products && layout.top_rated_products.length>0">
+      <ion-item lines="none">
+        {{"TOP_RATED" | translate}}
+        <ion-button slot="end" fill="clear"  (click)="goTo('product',{sortby:'rating'})">
+          See More
+          <ion-icon name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <ion-row class="thumnails" >
+        <ion-col size="4" *ngFor="let product of layout.top_rated_products">
+          <div class="product-item">
+            <ion-button class="fav" (click)="setFav(product)" fill="clear" slot="icon-only">
+              <ion-icon name="heart{{!wishlist.isFav(product) ? '-outline' : ''}}"></ion-icon>
+            </ion-button>
+            <div  (click)="goTo('productdetail', product)">
+              <img-loader [src]="product.images[0].src" useImg>
+                <ion-badge *ngIf="product.on_sale">{{product | discount}}</ion-badge>
+              </img-loader>
+              <h5 [innerHTML]="product.name" class="product-name"></h5>
+              <div class="price">
+                <span [innerHTML]="product.price_html"></span>
+              </div>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </div>
+  </div>
+</ion-content>

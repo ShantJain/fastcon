@@ -1,0 +1,30 @@
+
+.accent{
+  color: var(--accent_color) !important;
+}
+  .msg {
+    padding: 5px;
+    text-align: center;
+    margin: 0 15% auto;
+    border: 1px dashed #ccc;
+    border-width: 2px;
+    margin-bottom: 5px;
+  }
+
+  .header::after,
+  .footer::before {
+    display: none;
+  }
+
+  .fixed-content {
+    border-bottom: 1px solid #eee;
+  }
+
+  .row .col {
+    padding: 5px 0;
+
+    .button {
+      border-left: 1px solid #ddd;
+      height: 40px;
+    }
+  }

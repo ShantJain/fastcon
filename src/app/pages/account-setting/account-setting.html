@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button mode="md" fill="clear" icon-only (click)="backHome()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{'ACCOUNT'|translate}} {{'SETTING'|translate}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <div class="account-setting-form">
+    <form [formGroup]="form_info" (ngSubmit)="submit()" novalidate>
+      <ion-list no-lines>
+        <ion-list-header mode="md" no-margin no-padding>
+          {{"INFORMATION" | translate}}
+        </ion-list-header>
+        <ion-item no-padding>
+          <ion-label position="stacked">{{'FIRST_NAME'| translate }}</ion-label>
+          <ion-input formControlName="first_name" type="text" required [dir]="dir"></ion-input>
+        </ion-item>
+
+        <ion-item no-padding>
+          <ion-label position="stacked">{{'LAST_NAME'| translate }}</ion-label>
+          <ion-input formControlName="last_name" type="text" required [dir]="dir"></ion-input>
+        </ion-item>
+
+        <ion-item no-padding>
+          <ion-label position="stacked">{{'EMAIL' | translate}}</ion-label>
+          <ion-input formControlName="email" required [dir]="dir"></ion-input>
+        </ion-item>
+      </ion-list>
+    </form>
+  </div>
+  <div class="account-setting-form">
+    <form [formGroup]="form_change_pass" (ngSubmit)="submit()" novalidate>
+      <ion-list no-lines>
+        <ion-list-header mode="md" no-margin no-padding>
+          {{"PASSWORD_INFO" | translate}}
+        </ion-list-header>
+        <ion-item no-padding>
+          <ion-label position="stacked">{{'OLD'| translate}} {{'PASSWORD'| translate}}</ion-label>
+          <ion-input formControlName="opass" type="password" [dir]="dir"></ion-input>
+        </ion-item>
+
+        <ion-item no-padding>
+          <ion-label position="stacked">{{'NEW'| translate}} {{'PASSWORD'| translate}}</ion-label>
+          <ion-input formControlName="npass" type="password" [dir]="dir"></ion-input>
+        </ion-item>
+
+        <ion-item no-padding>
+          <ion-label position="stacked">{{'CONFIRM_PASSWORD'| translate}}</ion-label>
+          <ion-input formControlName="cpass" type="password" [dir]="dir"></ion-input>
+        </ion-item>
+      </ion-list>
+    </form>
+  </div>
+</ion-content>
+<ion-footer>
+  <ion-button expand="full"  (click)="submit()" class="accent-background">{{'SAVE'| translate}}</ion-button>
+</ion-footer>

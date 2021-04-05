@@ -1,0 +1,13 @@
+{
+  "appId": "com.phoe.fastconshopping",
+  "appName": "Fastcon Shopping",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {}
+}
